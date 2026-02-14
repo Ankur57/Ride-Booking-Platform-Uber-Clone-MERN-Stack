@@ -8,7 +8,7 @@ const LookingForDriver = (props) => {
        }}  className='  text-center absolute top-0 w-full'> <i className=" text-3xl text-gray-500 font-extrabold ri-arrow-down-s-line"></i></h5>
        <h3 className='text-2xl font-bold mb-5'>Looking for a Driver...</h3>
        <div className='flex gap-2 flex-col justify-between items-center '>
-        <img className="h-20 " src='https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_368,w_552/v1712027307/assets/42/eb85c3-e2dc-4e95-a70d-22ee4f08015f/original/Screenshot-2024-04-01-at-9.08.07p.m..png' alt="Car"></img>
+        <img className="h-20 " src='https://static.vecteezy.com/system/resources/thumbnails/036/105/722/small_2x/ai-generated-white-hatchback-car-png.png' alt="Car"></img>
        <div className='w-full mt-5'>
         <div className='flex items-center gap-5 p-3 border-b-2'>
             <i className=" text-lg ri-map-pin-fill"></i>
