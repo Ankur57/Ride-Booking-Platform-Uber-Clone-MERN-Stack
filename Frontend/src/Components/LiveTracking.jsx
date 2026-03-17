@@ -7,7 +7,10 @@ const containerStyle = {
 };
 
 const LiveTracking = () => {
-    const [ currentPosition, setCurrentPosition ] = useState(null);
+    const [ currentPosition, setCurrentPosition ] = useState(() => {
+        const savedPosition = localStorage.getItem('lastKnownPosition');
+        return savedPosition ? JSON.parse(savedPosition) : null;
+    });
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -15,21 +18,16 @@ const LiveTracking = () => {
     });
 
     useEffect(() => {
-        navigator.geolocation.getCurrentPosition((position) => {
+        const updateLocation = (position) => {
             const { latitude, longitude } = position.coords;
-            setCurrentPosition({
-                lat: latitude,
-                lng: longitude
-            });
-        });
+            const newPos = { lat: latitude, lng: longitude };
+            setCurrentPosition(newPos);
+            localStorage.setItem('lastKnownPosition', JSON.stringify(newPos));
+        };
 
-        const watchId = navigator.geolocation.watchPosition((position) => {
-            const { latitude, longitude } = position.coords;
-            setCurrentPosition({
-                lat: latitude,
-                lng: longitude
-            });
-        });
+        navigator.geolocation.getCurrentPosition(updateLocation);
+
+        const watchId = navigator.geolocation.watchPosition(updateLocation);
 
         return () => navigator.geolocation.clearWatch(watchId);
     }, []);
