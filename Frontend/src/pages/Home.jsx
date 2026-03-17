@@ -10,6 +10,7 @@ import VehiclePanel from '../Components/VehiclePanel'
 import ConfirmedRide from '../Components/ConfirmedRide'
 import LookingForDriver from '../Components/LookingForDriver'
 import { SocketContext } from '../Context/SocketContext';
+import { UserContext } from '../Context/UserContext';
 import WaitingForDriver from '../Components/WaitingForDriver'
 import LiveTracking from '../Components/LiveTracking';
 
@@ -35,7 +36,23 @@ const Home = () => {
 
   const navigate = useNavigate()
   const { socket } = useContext(SocketContext);
+  const { user } = useContext(UserContext);
 
+  useEffect(() => {
+    if (user && socket) {
+      const join = () => {
+        socket.emit('join', {
+          userType: 'user',
+          userId: user._id
+        });
+      };
+      join();
+      socket.on('connect', join);
+      return () => {
+        socket.off('connect', join);
+      };
+    }
+  }, [user, socket]);
 
   useEffect(() => {
     if (!socket) return;
@@ -190,8 +207,8 @@ const Home = () => {
       <div className='h-screen w-screen'>
         <LiveTracking />
       </div>
-      <div className=' h-screen flex flex-col justify-end top-0 absolute w-full'>
-        <div className='h-[30%] bg-white p-5 relative '>
+      <div className=' h-screen flex flex-col justify-end top-0 absolute w-full pointer-events-none'>
+        <div className='h-[30%] bg-white p-5 relative pointer-events-auto'>
           <h5 onClick={() => {
             setPanelOpen(false)
           }} className='absolute right-4 text-2xl'>
@@ -226,7 +243,7 @@ const Home = () => {
             Find Trip
           </button>
         </div>
-        <div ref={panelRef} className='bg-white h-0'>
+        <div ref={panelRef} className='bg-white h-0 pointer-events-auto'>
           <LocationSearchPanel
             suggestions={activeField === 'pickup' ? pickupSuggestions : destinationSuggestions}
             setPanelOpen={setPanelOpen}

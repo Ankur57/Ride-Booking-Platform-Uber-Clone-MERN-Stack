@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom' // Added useLocation
 import { useEffect, useContext } from 'react'
 import { SocketContext } from '../Context/SocketContext'
+import { UserContext } from '../Context/UserContext'
 import { useNavigate } from 'react-router-dom'
 import LiveTracking from '../Components/LiveTracking'
 
@@ -8,11 +9,38 @@ const Ride = (props) => {
      const location = useLocation()
     const { ride } = location.state || {} // Retrieve ride data
     const { socket } = useContext(SocketContext)
+    const { user } = useContext(UserContext)
     const navigate = useNavigate()
 
-     socket.on("ride-ended", () => {
-        navigate('/home')
-    })
+    useEffect(() => {
+        if (user && socket) {
+            const join = () => {
+                socket.emit('join', {
+                    userType: 'user',
+                    userId: user._id
+                });
+            };
+            join();
+            socket.on('connect', join);
+            return () => {
+                socket.off('connect', join);
+            };
+        }
+    }, [user, socket]);
+
+    useEffect(() => {
+        if (!socket) return;
+        
+        const handleRideEnded = () => {
+            navigate('/home')
+        };
+        
+        socket.on("ride-ended", handleRideEnded);
+        
+        return () => {
+            socket.off("ride-ended", handleRideEnded);
+        }
+    }, [socket, navigate])
   return (
     <div className='h-screen'>
         <Link to='/home' className='fixed  right-2 top-2 h-10 w-10 bg-white flex items-center justify-center rounded-full'>

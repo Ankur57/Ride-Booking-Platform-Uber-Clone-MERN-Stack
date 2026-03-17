@@ -23,10 +23,17 @@ const CaptainHome = () => {
 
   useEffect(() => {
     if (socket && captain?._id) {
-      socket.emit('join', {
-        userId: captain._id,
-        userType: 'captain'
-      })
+      const join = () => {
+        socket.emit('join', {
+          userId: captain._id,
+          userType: 'captain'
+        });
+      };
+      join();
+      socket.on('connect', join);
+      return () => {
+        socket.off('connect', join);
+      };
     }
   }, [socket, captain])
 
